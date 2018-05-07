@@ -22,25 +22,26 @@ def quote_applescript(string):
     return '"%s"' % "".join(charmap.get(char, char) for char in string)
 
 
-def elevate(show_console=True):
+def elevate(show_console=True, graphical=True):
     if os.getuid() == 0:
         return
 
     args = [sys.executable] + sys.argv
     commands = []
 
-    if sys.platform.startswith("darwin"):
-        commands.append([
-            "osascript",
-            "-e",
-            "do shell script %s "
-            "with administrator privileges "
-            "without altering line endings"
-            % quote_applescript(quote_shell(args))])
+    if graphical:
+        if sys.platform.startswith("darwin"):
+            commands.append([
+                "osascript",
+                "-e",
+                "do shell script %s "
+                "with administrator privileges "
+                "without altering line endings"
+                % quote_applescript(quote_shell(args))])
 
-    if sys.platform.startswith("linux") and os.environ.get("DISPLAY"):
-        commands.append(["gksudo"] + args)
-        commands.append(["kdesudo"] + args)
+        if sys.platform.startswith("linux") and os.environ.get("DISPLAY"):
+            commands.append(["gksudo"] + args)
+            commands.append(["kdesudo"] + args)
 
     commands.append(["sudo"] + args)
 

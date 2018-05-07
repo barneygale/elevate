@@ -63,8 +63,8 @@ CloseHandle.restype = BOOL
 
 # At last, the actual implementation!
 
-def elevate(show_console=True):
-    if windll.shell32.IsUserAnAdmin():
+def elevate(show_console=True, graphical=True):
+    if windll.shell32.IsUser, AnAdmin():
         return
 
     params = ShellExecuteInfo(
