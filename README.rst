@@ -10,21 +10,25 @@ root/admin privileges using one of the following mechanisms:
 - ``kdesudo`` (Linux)
 - ``sudo`` (Linux, macOS)
 
-To use, call ``elevate.elevate()`` early in your script. When not run as root,
-this function replaces the current process (Linux, macOS) or creates a child
-process, waits, and exits (Windows).
+To use, call ``elevate.elevate()`` early in your script. When run as root this
+function does nothing. When not run as root, this function replaces the current
+process (Linux, macOS) or creates a child process, waits, and exits (Windows).
+Consider the following example:
 
-To illustrate, consider the following example::
+.. code-block:: python
 
     import os
     from elevate import elevate
 
-    print("# before ", os.getuid())
+    def is_root():
+        return os.getuid() == 0
+
+    print("before ", is_root())
     elevate()
-    print("# after ", os.getuid())
+    print("after ", is_root())
 
 This prints::
 
-    # before 1000
-    # before 0
-    # after 0
+    before False
+    before True
+    after True
