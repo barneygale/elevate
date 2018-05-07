@@ -31,7 +31,9 @@ def elevate():
             commands.append([
                 "osascript",
                 "-e",
-                "do shell script %s with administrator privileges"
+                "do shell script %s "
+                "with administrator privileges "
+                "without altering line endings"
                 % quote_applescript(quote_shell(args))])
 
         if sys.platform.startswith("linux") and os.environ.get("DISPLAY"):
