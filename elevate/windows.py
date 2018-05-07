@@ -7,7 +7,7 @@ import sys
 
 # Constant defintions
 
-SW_SHOW = 5
+
 SEE_MASK_NOCLOSEPROCESS = 0x00000040
 SEE_MASK_NO_CONSOLE = 0x00008000
 
@@ -63,7 +63,7 @@ CloseHandle.restype = BOOL
 
 # At last, the actual implementation!
 
-def elevate():
+def elevate(show_console=True):
     if windll.shell32.IsUserAnAdmin():
         return
     params = ShellExecuteInfo(
@@ -72,7 +72,7 @@ def elevate():
         lpVerb=b'runas',
         lpFile=sys.executable.encode('cp1252'),
         lpParameters=subprocess.list2cmdline(sys.argv).encode('cp1252'),
-        nShow=SW_SHOW)
+        nShow=int(show_console))
 
     if not ShellExecuteEx(ctypes.byref(params)):
         raise ctypes.WinError()

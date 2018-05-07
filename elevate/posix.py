@@ -22,7 +22,7 @@ def quote_applescript(string):
     return '"%s"' % "".join(charmap.get(char, char) for char in string)
 
 
-def elevate():
+def elevate(show_console=True):
     if os.getuid() != 0:
         args = [sys.executable] + sys.argv
         commands = []
