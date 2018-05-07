@@ -23,28 +23,30 @@ def quote_applescript(string):
 
 
 def elevate(show_console=True):
-    if os.getuid() != 0:
-        args = [sys.executable] + sys.argv
-        commands = []
+    if os.getuid() == 0:
+        return
 
-        if sys.platform.startswith("darwin"):
-            commands.append([
-                "osascript",
-                "-e",
-                "do shell script %s "
-                "with administrator privileges "
-                "without altering line endings"
-                % quote_applescript(quote_shell(args))])
+    args = [sys.executable] + sys.argv
+    commands = []
 
-        if sys.platform.startswith("linux") and os.environ.get("DISPLAY"):
-            commands.append(["gksudo"] + args)
-            commands.append(["kdesudo"] + args)
+    if sys.platform.startswith("darwin"):
+        commands.append([
+            "osascript",
+            "-e",
+            "do shell script %s "
+            "with administrator privileges "
+            "without altering line endings"
+            % quote_applescript(quote_shell(args))])
 
-        commands.append(["sudo"] + args)
+    if sys.platform.startswith("linux") and os.environ.get("DISPLAY"):
+        commands.append(["gksudo"] + args)
+        commands.append(["kdesudo"] + args)
 
-        for args in commands:
-            try:
-                os.execlp(args[0], *args)
-            except OSError as e:
-                if e.errno != errno.ENOENT or args[0] == "sudo":
-                    raise
+    commands.append(["sudo"] + args)
+
+    for args in commands:
+        try:
+            os.execlp(args[0], *args)
+        except OSError as e:
+            if e.errno != errno.ENOENT or args[0] == "sudo":
+                raise

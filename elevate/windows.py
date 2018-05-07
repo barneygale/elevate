@@ -66,6 +66,7 @@ CloseHandle.restype = BOOL
 def elevate(show_console=True):
     if windll.shell32.IsUserAnAdmin():
         return
+
     params = ShellExecuteInfo(
         fMask=SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NO_CONSOLE,
         hwnd=None,
