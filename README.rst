@@ -6,8 +6,7 @@ root/admin privileges using one of the following mechanisms:
 
 - UAC (Windows)
 - AppleScript (macOS)
-- ``gksudo`` (Linux)
-- ``kdesudo`` (Linux)
+- ``pkexec``, ``gksudo`` or ``kdesudo`` (Linux)
 - ``sudo`` (Linux, macOS)
 
 Usage

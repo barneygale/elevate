@@ -40,6 +40,7 @@ def elevate(show_console=True, graphical=True):
                 % quote_applescript(quote_shell(args))])
 
         if sys.platform.startswith("linux") and os.environ.get("DISPLAY"):
+            commands.append(["pkexec"] + args)
             commands.append(["gksudo"] + args)
             commands.append(["kdesudo"] + args)
 
