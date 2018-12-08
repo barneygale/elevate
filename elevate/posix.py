@@ -1,4 +1,5 @@
 import errno
+import elevate.elevate_util as elevate_util
 import os
 import sys
 try:
@@ -22,11 +23,36 @@ def quote_applescript(string):
     return '"%s"' % "".join(charmap.get(char, char) for char in string)
 
 
-def elevate(show_console=True, graphical=True):
+def elevate(show_console=True, graphical=True, restore_cwd=True):
+    # sys.argv has been changed here
+    # check both values just in case _process_elevate_opts wasn't
+    #   already called on import
+    elevate_opts = elevate_util._process_elevate_opts() \
+        or elevate_util._ELEVATE_GOT_ARGS
+
     if os.getuid() == 0:
+        newdir = elevate_util._get_opt(elevate_opts, "cwd")
+        if newdir and restore_cwd:
+            try:                      os.chdir(newdir)
+            except FileNotFoundError: pass
+            except Exception as e:    raise
         return
 
-    args = [sys.executable] + sys.argv
+    # prevent infinite recursion in all cases
+    if elevate_util._get_opt(elevate_opts, "invocation"):
+        return
+
+    args = [
+        sys.executable,
+        os.path.abspath(sys.argv[0]),
+        elevate_util._make_opt("invocation", "True")
+    ] + sys.argv[1:]
+
+    # some argument parsers can't understand empty command-line options like ""
+    #   so an explicit conditional append is needed
+    if restore_cwd:
+        args.append( elevate_util._make_opt("cwd", os.getcwd()) )
+
     commands = []
 
     if graphical:

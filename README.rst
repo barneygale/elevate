@@ -42,3 +42,9 @@ new console window. To suppress this window, use
 
 On Linux and macOS, graphical prompts are tried before ``sudo`` by default. To
 prevent graphical prompts, use ``elevate(graphical=False)``.
+
+On Linux and macOS, ``pkexec`` and some versions of ``sudo`` don't preserve the
+calling process' working directory. To fix this, ``elevate`` by default
+preserves the previous working directory. To disable this behaviour, if it is
+more insecure than useful, use ``elevate(restore_cwd=False)``. On Windows, the
+calling process' working directory is always preserved.

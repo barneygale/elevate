@@ -1,10 +1,11 @@
 import ctypes
+import elevate.elevate_util as elevate_util
 from ctypes import POINTER, c_ulong, c_char_p, c_int, c_void_p
 from ctypes.wintypes import HANDLE, BOOL, DWORD, HWND, HINSTANCE, HKEY
 from ctypes import windll
 import subprocess
 import sys
-
+from os.path import abspath
 # Constant defintions
 
 
@@ -63,8 +64,16 @@ CloseHandle.restype = BOOL
 
 # At last, the actual implementation!
 
-def elevate(show_console=True, graphical=True):
-    if windll.shell32.IsUserAnAdmin():
+def elevate(show_console=True, graphical=True, restore_cwd=True):
+    # sys.argv is changed
+    # check both values just in case _process_elevate_opts wasn't
+    #   already called on import
+    elevate_opts = elevate_util._process_elevate_opts() \
+        or elevate_util._ELEVATE_GOT_ARGS
+
+    if (windll.shell32.IsUserAnAdmin()
+            # prevent infinite recursion in all cases
+            or elevate_util._get_opt(elevate_opts, "invocation")):
         return
 
     params = ShellExecuteInfo(
@@ -72,7 +81,12 @@ def elevate(show_console=True, graphical=True):
         hwnd=None,
         lpVerb=b'runas',
         lpFile=sys.executable.encode('cp1252'),
-        lpParameters=subprocess.list2cmdline(sys.argv).encode('cp1252'),
+        lpParameters=subprocess.list2cmdline(
+            [
+                abspath(sys.argv[0]),
+                elevate_util._make_opt("invocation", "True")
+            ] + sys.argv[1:]
+        ).encode('cp1252'),
         nShow=int(show_console))
 
     if not ShellExecuteEx(ctypes.byref(params)):
