@@ -42,3 +42,16 @@ new console window. To suppress this window, use
 
 On Linux and macOS, graphical prompts are tried before ``sudo`` by default. To
 prevent graphical prompts, use ``elevate(graphical=False)``.
+
+Command-line arguments that exist as files on disk will be transformed to
+absolute paths by default. To prevent rewriting of arguments, use
+``elevate(make_absolute=False)``
+
+As a security measure, the working directory may not be preserved by some
+versions of ``sudo``. To preserve the working directory, use
+``elevate(preserve_cwd=True)``; this also has the effect of preventing a
+possible infinite loop in certain UAC configurations on Windows. However,
+preserving the working directory requires passing additional command-line
+arguments to the elevated process, and so you should take care to add support
+for ``--elevate-cwd PATH`` to your command-line parser (if any). When using
+``argparse``, you may find ``elevate.add_argparse_argument(parser)`` useful.
