@@ -39,8 +39,8 @@ def elevate(show_console=True, graphical=True):
                 "without altering line endings"
                 % quote_applescript(quote_shell(args))])
 
-        if sys.platform.startswith("linux") and os.environ.get("DISPLAY"):
-            commands.append(["pkexec"] + args)
+        if sys.platform.startswith("linux"):
+            commands.append(["pkexec env DISPLAY={0} XAUTHORITY={1}".format(os.environ.get("DISPLAY"),os.environ.get("XAUTHORITY"))] + args)
             commands.append(["gksudo"] + args)
             commands.append(["kdesudo"] + args)
 
@@ -48,7 +48,7 @@ def elevate(show_console=True, graphical=True):
 
     for args in commands:
         try:
-            os.execlp(args[0], *args)
+            os.execlp(args[0].split()[0], *args)
         except OSError as e:
             if e.errno != errno.ENOENT or args[0] == "sudo":
                 raise
