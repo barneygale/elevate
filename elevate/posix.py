@@ -45,6 +45,7 @@ def elevate(show_console=True, graphical=True):
             commands.append(["kdesudo"] + args)
 
     commands.append(["sudo"] + args)
+    commands.append(["doas"] + args)
 
     for args in commands:
         try:
