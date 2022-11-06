@@ -51,5 +51,5 @@ def elevate(show_console=True, graphical=True):
         try:
             os.execlp(args[0], *args)
         except OSError as e:
-            if e.errno != errno.ENOENT or args[0] == "sudo":
+            if e.errno != errno.ENOENT:
                 raise
